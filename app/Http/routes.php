@@ -15,6 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('/results', 'ResultController@search');
+
+Route::post('/results', 'ResponseController@search');
 
 ?>
