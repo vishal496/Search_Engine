@@ -11,11 +11,10 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 
 Route::post('/results', 'ResponseController@search');
 
-?>
+
+Route::auth();
+
+Route::get('/', 'HomeController@index');
