@@ -10,7 +10,7 @@
             {{ Form::text('query',null,['class' => 'input']) }}
         </div>
         <div >
-            {{ Form::submit('SEARCH', ['name' => 'search','class' => 'button']) }} 
+            {{ Form::submit('SEARCH', ['name' => 'search','class' => 'button', 'value'=>'xxxx']) }} 
             {{ Form::submit('NEWS', ['name' => 'search','class' => 'button']) }} 
             {{ Form::submit('TRENDING', ['name' => 'search','class' => 'button']) }}
         </div>
