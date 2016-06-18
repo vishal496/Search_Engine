@@ -58,9 +58,11 @@ class ResponseController extends Controller
         // gets the data response to be displayed in view.
         $searchResponse = $this->resultModel->getFarooResponse($src,$query);
 
+        $viewResponse = json_decode(($searchResponse),true);
+
         // gives the number of results in array.
-        $count = count($searchResponse[$type]);
+        $count = count($viewResponse[$type]);
         
-        return view($view, compact('searchResponse','count','type'));
+        return view($view, compact('viewResponse','count','type'));
     }
 }
