@@ -3,6 +3,7 @@
 namespace API\Http\Controllers;
 
 use API\Result;
+use API\LogModel;
 use API\Http\Requests;
 use Illuminate\Http\Request;
 
@@ -10,15 +11,17 @@ class ResponseController extends Controller
 {
     protected $resultModel;
     protected $incomingRequest;
+    protected $logEntry;
 
     /*
      *Initializes the object for Result class 
      *and Request class.
 	*/
-    function __construct(Result $result, Request $request)
+    function __construct(Result $result, LogModel $logs,Request $request)
     {
     	$this->resultModel = $result;
     	$this->incomingRequest = $request;
+        $this->logEntry = $logs;
     }
 
    /*
@@ -32,14 +35,14 @@ class ResponseController extends Controller
     	$query = $this->incomingRequest->input('query');
 
     	// type of query made by user.
-    	$queryParam = $this->incomingRequest->input('search');
+    	$queryType = $this->incomingRequest->input('type');
 
     	//variables used for displaying the output.
     	$type = "results";
     	$view = "search"; 
        
         // switch case to handle the type of search made by user.
-    	switch ($queryParam) {
+    	switch ($queryType) {
     		case 'SEARCH':
     			$src = "web";
     			break;
@@ -62,6 +65,9 @@ class ResponseController extends Controller
 
         // gives the number of results in array.
         $count = count($viewResponse[$type]);
+
+        // keeping track of search made by different users in database.
+        $log = $this->logEntry->logTableEntry($src,$query);
         
         return view($view, compact('viewResponse','count','type'));
     }
