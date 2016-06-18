@@ -2,13 +2,12 @@
 namespace API;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
 
 
 class Result extends Model
 {
 
-    function __construct(Request $request)
+    function __construct()
     {
     	
     }
@@ -18,20 +17,20 @@ class Result extends Model
      *
      * @param string     src        type of search made by user. 
      * @param string     query      query made by user.
-     * @return php array which was converted from a json response received from the faroo search api.
+     * @return json response received from the faroo search api.
      *
      */
     public function getFarooResponse($src,$query)
     {
  		
         //formating the url using php function.
-        $data = array('q'=>$query,
-                      'start'=>'1',
-                      'length'=>'10',
-                      'l'=>'en',
-                      'src'=>$src,
-                      'i'=>'false',
-                      'f'=>'json');
+        $data = ['q'=>$query,
+                 'start'=>'1',
+                 'length'=>'10',
+                 'l'=>'en',
+                 'src'=>$src,
+                 'i'=>'false',
+                 'f'=>'json'];
 
         // api key and api url in .env file
         // Url to be hit for the search.
@@ -40,12 +39,9 @@ class Result extends Model
 		// Curl request handling.
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$mapsJson = curl_exec($ch);
+		$farooResponse = curl_exec($ch);
 		curl_close($ch);
 
-		// Converting the JSON response to a PHP array.
-		$responseArray = json_decode(($mapsJson),true);
-
-		return $responseArray;
+		return $farooResponse;
     }
 }
