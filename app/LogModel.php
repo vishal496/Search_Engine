@@ -3,29 +3,40 @@
 namespace API;
 
 use DateTime;
-use Illuminate\Database\DatabaseManager as DB;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\DatabaseManager as DB;
 
 class LogModel extends Model
 {
-    protected $authenticate;
     protected $database;
 
-    function __construct(Request $auth,DB $db)
+    //Instantiate new object for Result class
+    function __construct(DB $db)
     {
-    	$this->authenticate = $auth;
     	$this->database = $db;
     }
 
     /*
-     *This function is used to make an entry in database to keep a record of all the search made by different user.
-     *@param string   src     type of search made by user.
-     *@param string   query   actual query made by the user.
+     *This function is used to make an entry in database 
+     *to keep a record of all the search made by different user.
+     *@param string---src-----type of search made by user.
+     *@param string---query---actual query made by the user.
+     *@param int------userId--user id of logged in user.
     */
-    public function logTableEntry($src,$query)
-    {
-    	$user_id = $this->authenticate->user()->id;
-    	$insertQuery = $this->database->table('logs')->insert(['user_id'=>$user_id,'query'=>$query,'query_type'=>$src,'created_at'=>new DateTime, 'updated_at'=>new DateTime]);		
+    public function logTableEntry($src, $query, $userId)
+    {                   
+        $updateQuery = $this->database
+                       ->update('UPDATE users SET totalqueries = totalqueries+1 WHERE id = ?', [$userId]);
+
+        $insertQuery = $this->database
+                       ->table('searchlogs')
+                       ->insert([
+                            'user_id'=>$userId,
+                            'query'=>$query,
+                            'query_type'=>$src,
+                            'created_at'=>new DateTime,
+                            'updated_at'=>new DateTime]
+                        );		
     }
 }
