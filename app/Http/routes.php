@@ -11,10 +11,8 @@
 |
 */
 
-
-Route::post('/results', 'ResponseController@search');
-
-
 Route::auth();
 
 Route::get('/', 'HomeController@index');
+
+Route::post('/results', 'ResponseController@search');
