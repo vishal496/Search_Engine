@@ -3,66 +3,72 @@
 namespace API\Http\Controllers;
 
 use API\Result;
+use API\LogModel;
 use API\Http\Requests;
 use Illuminate\Http\Request;
 
 class ResponseController extends Controller
 {
     protected $resultModel;
-    protected $response;
+    protected $incomingRequest;
+    protected $logEntry;
 
-    function __construct(Result $result, Request $request)
+    /*
+     *Initializes the object for Result class 
+     *and Request class.
+	*/
+    function __construct(Result $result, LogModel $logs,Request $request)
     {
     	$this->resultModel = $result;
-    	$this->response = $request;
+    	$this->incomingRequest = $request;
+        $this->logEntry = $logs;
     }
 
    /*
-    * This method is used to call the different type of search made by the user. 
-    *
-    * @param param_type param_name param_description
-    *  
-
-    * @return view to be called.
-    */
+    * Returns the response of user search query 
+    * @return view helper function which has two parameters i.e. view to be called and an array that has data required for the view to display.
+   */
 
    public function search()
     {
-    	$queryParam = $this->response->input('search'); 
+    	// Query made by user.
+    	$query = $this->incomingRequest->input('query');
+
+    	// type of query made by user.
+    	$queryType = $this->incomingRequest->input('type');
+
+    	//variables used for displaying the output.
+    	$type = "results";
+    	$view = "search"; 
        
         // switch case to handle the type of search made by user.
-    	switch ($queryParam) {
+    	switch ($queryType) {
     		case 'SEARCH':
     			$src = "web";
-    			$type = "results";
-    			$view = "search";
-  
-    			$searchResponse = $this->resultModel->getFarooResponse($src);
-				
-				break;
+    			break;
 
     		case 'NEWS':
     			$src = "news";
-    			$type = "results";
-    			$view = "search";
-
-    			$searchResponse = $this->resultModel->getFarooResponse($src);
-    			
     			break;
 
     		case 'TRENDING':
     			$src = "topics";
     			$type = "topics";
     			$view = "trending";
-    			
-    			$searchResponse = $this->resultModel->getFarooResponse($src);
-				
 				break;
 		}		
         
+        // gets the data response to be displayed in view.
+        $searchResponse = $this->resultModel->getFarooResponse($src,$query);
+
+        $viewResponse = json_decode(($searchResponse),true);
+
         // gives the number of results in array.
-        $count = count($searchResponse[$type]);
+        $count = count($viewResponse[$type]);
+
+        // keeping track of search made by different users in database.
+        $log = $this->logEntry->logTableEntry($src,$query);
         
-        return view($view, compact('searchResponse','count','type'));
+        return view($view, compact('viewResponse','count','type'));
     }
 }
